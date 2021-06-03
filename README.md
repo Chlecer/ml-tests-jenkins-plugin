@@ -1,6 +1,8 @@
 # Machine Learning (ML) Tests Jenkins Plugin
 
-<img src="images/ic-app-icon.svg" width="192">
+## Architecture overview
+
+![ad](images/architecture-overview.jpg)
 
 ## Introduction
 
