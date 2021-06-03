@@ -1,0 +1,4 @@
+<?jelly escape-by-default='true'?>
+<div>
+    Publish your test results to ML Tests - ML Server as a post build action from Jenkins
+</div>
