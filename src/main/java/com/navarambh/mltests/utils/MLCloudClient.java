@@ -22,15 +22,13 @@ public class MLCloudClient {
     private static final String IMPORT_RESULTS_FILE = "/project/{mlProjectId}/testcycle/{testCycleId}/import/results";
     private static final String CREATE_CYCLE = "/project/{mlProjectId}/testcycle/detail";
     private String projectId;
-    private Secret apiKey;
 
-    public MLCloudClient(String projectId, Secret apiKey) {
+    public MLCloudClient(String projectId) {
         this.projectId = projectId;
-        this.apiKey = apiKey;
     }
 
     public HttpResponse<String> importResults(String frameworkType, boolean createNewCycle, String testCycleId,
-                                                 boolean addCase, boolean createCase, boolean bddForceUpdateCase,
+                                                 boolean addCase,
                                                 boolean hideDetails,
                                                 File f, Run<?, ?> run, PrintStream logger) {
         String cycleKey;
@@ -44,7 +42,7 @@ public class MLCloudClient {
             cycleKey = testCycleId;
         }
         logger.println("Updating results for " + cycleKey);
-        HttpResponse<String> response = this.importResults(cycleKey, frameworkType, addCase, createCase, bddForceUpdateCase, f);
+        HttpResponse<String> response = this.importResults(cycleKey, frameworkType, addCase, f);
         JSONObject responseBody = this.validateResponse(response, "Import results");
         logResults(frameworkType, responseBody, hideDetails, logger);
         return response;
@@ -106,23 +104,20 @@ public class MLCloudClient {
 
         return Unirest.post(getMLEndpoint(CREATE_CYCLE))
                 .header(CONTENT_TYPE_HEADER, APPLICATION_JSON_UNICODE)
-                .header("Authorization", getAuthKey(this.apiKey.getPlainText()))
+                .header("Authorization", getAuthKey("fakeApiKey"))
                 .routeParam("mlProjectId", this.projectId)
                 .body(jsonObject).asString();
     }
 
     private HttpResponse<String> importResults(String testCycleId, String frameworkType,
-                                                 boolean addCase, boolean createCase, boolean bddForceUpdateCase, File f) {
+                                                 boolean addCase, File f) {
         String uploadEndpoint = getMLEndpoint(IMPORT_RESULTS_FILE);
         return Unirest.post(uploadEndpoint)
-                .header("Authorization", getAuthKey(this.apiKey.getPlainText()))
+                .header("Authorization", getAuthKey("fakeApiKey"))
                 .queryString("type",frameworkType)
                 .routeParam("mlProjectId", this.projectId)
                 .routeParam("testCycleId", testCycleId)
-                .field("file", f)
-                .field("addCaseToCycle", Boolean.toString(addCase))
-                .field("createCase", Boolean.toString(createCase))
-                .field("bddForceUpdateCase", Boolean.toString(bddForceUpdateCase)).asString();
+                .field("file", f).asString();
     }
 
     private static String getMLEndpoint(String url) {

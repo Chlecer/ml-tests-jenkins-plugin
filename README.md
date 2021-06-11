@@ -58,33 +58,23 @@ Below is an example.
 ```
 pipeline {
        agent any
-       environment {
-           ML_TESTS_API_KEY = credentials('mlTestApiKey')
-       }
+
        stages {
            stage('SCM') {
                steps {
-                   git 'https://github.com/org/sample-testng-tests.git'                       
+                   git 'https://github.com/allure-examples/allure-testng-example.git'                       
                }
            }
            stage('Build') {
                steps {
-                   sh 'mvn test'
+                   sh './mvnw clean install'
                }
            }
        }
        post {
            always {
                    mlImport frameworkType : 'TestNG',
-                         addCaseToCycle :true,
-                         createCase :true,
-                         entry: [$class: 'NewCycle', cyclePrefix: 'Regression Run V1.0'],
-                        //For existing cycles : entry: [$class: 'ExistingCycle', cycleKey: 'SCRUM-CY-191'],
-                         apiKey : hudson.util.Secret.fromString(env.ML_TESTS_API_KEY),
-                         resultsFilePath : '/target/surefire-reports/testng-results.xml',
-                         projectKey: 'SCRUM',
-                         hideDetails: false
-               
+                         resultsFilePath : '/target/surefire-reports'
            }
        }
    }
