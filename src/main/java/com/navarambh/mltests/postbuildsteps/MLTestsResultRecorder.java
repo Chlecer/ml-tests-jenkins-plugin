@@ -1,6 +1,8 @@
 package com.navarambh.mltests.postbuildsteps;
 
 import com.google.common.collect.ImmutableList;
+import com.navarambh.mltests.model.MLFailure;
+import com.navarambh.mltests.model.MLTestCase;
 import com.navarambh.mltests.model.MLTestResult;
 import com.navarambh.mltests.utils.FileUtils;
 import com.thoughtworks.xstream.XStream;
@@ -39,9 +41,8 @@ public class MLTestsResultRecorder extends Recorder implements SimpleBuildStep {
     private static final XStream XSTREAM = new XStream2();
 
     static {
-        XSTREAM.alias("testsuite", MLTestResult.class);
         XSTREAM.ignoreUnknownElements();
-        XSTREAM.processAnnotations(MLTestResult.class);
+        XSTREAM.processAnnotations(new Class[] { MLTestResult.class, MLTestCase.class, MLFailure.class});
         XSTREAM.registerConverter(new HeapSpaceStringConverter(), 100);
     }
 
@@ -93,9 +94,10 @@ public class MLTestsResultRecorder extends Recorder implements SimpleBuildStep {
             taskListener.getLogger().println("File found -> " + xmlFile.getName());
             XmlFile xmlHudsonFile = new XmlFile(XSTREAM, xmlFile);
             MLTestResult result = (MLTestResult) xmlHudsonFile.read();
-            taskListener.getLogger().println("Number of properties size -> " + result.getProperties().get(0));
+            taskListener.getLogger().println("name->>" + result.getName() + result.getTestcase().toString() +
+                    " | " + result.getProperties().get(0).getProperty("java.class.version"));
         }
-        
+
         logStartEnd(false, taskListener);
 
     }

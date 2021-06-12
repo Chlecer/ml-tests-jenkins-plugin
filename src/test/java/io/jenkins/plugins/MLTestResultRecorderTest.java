@@ -1,5 +1,7 @@
 package io.jenkins.plugins;
 
+import com.navarambh.mltests.model.MLFailure;
+import com.navarambh.mltests.model.MLTestCase;
 import com.navarambh.mltests.model.MLTestResult;
 import com.thoughtworks.xstream.XStream;
 import hudson.XmlFile;
@@ -20,21 +22,17 @@ public class MLTestResultRecorderTest {
     @Test
     @DisplayName("Test first test")
     void test() {
-        /*assertThrows(IOException.class, () -> {
-            XmlFile xmlHudsonFile = new XmlFile(XSTREAM, getDataFile("/test.xml"));
-            MLTestResult result = (MLTestResult) xmlHudsonFile.read();
-        });*/
 
         XmlFile xmlHudsonFile = null;
         try {
             xmlHudsonFile = new XmlFile(XSTREAM, getDataFile("/test.xml"));
             MLTestResult result = (MLTestResult) xmlHudsonFile.read();
-            System.out.println("namee->>>" + result.getName());
+            System.out.println("name->>" + result.getName() + result.getTestcase().toString() +
+                    " | " + result.getProperties().get(0).getProperty("java.class.version"));
         } catch (URISyntaxException | IOException e) {
             e.printStackTrace();
             System.out.println("deu coco");
         }
-
     }
 
     @Test
@@ -51,9 +49,8 @@ public class MLTestResultRecorderTest {
     private static final XStream XSTREAM = new XStream2();
 
     static {
-        XSTREAM.alias("testsuite", MLTestResult.class);
         XSTREAM.ignoreUnknownElements();
-        XSTREAM.processAnnotations(MLTestResult.class);
+        XSTREAM.processAnnotations(new Class[] { MLTestResult.class, MLTestCase.class, MLFailure.class});
         XSTREAM.registerConverter(new HeapSpaceStringConverter(), 100);
     }
 
