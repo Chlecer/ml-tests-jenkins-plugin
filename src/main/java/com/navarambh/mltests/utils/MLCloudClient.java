@@ -2,7 +2,6 @@ package com.navarambh.mltests.utils;
 
 import com.google.gson.JsonObject;
 import hudson.model.Run;
-import hudson.util.Secret;
 import kong.unirest.HttpResponse;
 import kong.unirest.JsonNode;
 import kong.unirest.Unirest;
@@ -16,33 +15,23 @@ import java.util.Iterator;
 public class MLCloudClient {
     private static final String CONTENT_TYPE_HEADER = "Content-Type";
     private static final String APPLICATION_JSON_UNICODE = "application/json;charset=UTF-8";
-    private static final String ML_TESTS_HOST = "https://tcms.mlreports.com/ml-tcms";
+    private static final String ML_TESTS_HOST = "http://host.docker.internal:9090/";
     private static final String API_VERSION = "/api/v1";
     private static final String ML_SCHEME = "AioAuth";
     private static final String IMPORT_RESULTS_FILE = "/project/{mlProjectId}/testcycle/{testCycleId}/import/results";
-    private static final String CREATE_CYCLE = "/project/{mlProjectId}/testcycle/detail";
+    private static final String CREATE_CYCLE = "/tests";
     private String projectId;
 
     public MLCloudClient(String projectId) {
         this.projectId = projectId;
     }
 
-    public HttpResponse<String> importResults(String frameworkType, boolean createNewCycle, String testCycleId,
-                                                 boolean addCase,
-                                                boolean hideDetails,
-                                                File f, Run<?, ?> run, PrintStream logger) {
-        String cycleKey;
-        if(createNewCycle) {
-            logger.println("Creating new cycle with prefix " + testCycleId + " ....");
-            HttpResponse<String> response = this.createCycle(testCycleId, run);
-            JSONObject responseBody = this.validateResponse(response, "Cycle creation");
-            cycleKey = responseBody.getString("key");
-            logger.println("Cycle created successfully " + cycleKey);
-        } else {
-            cycleKey = testCycleId;
-        }
-        logger.println("Updating results for " + cycleKey);
-        HttpResponse<String> response = this.importResults(cycleKey, frameworkType, addCase, f);
+    public HttpResponse<String> importResults(String frameworkType, boolean hideDetails, Run<?, ?> run,
+                                              PrintStream logger) {
+
+        logger.println("Creating new cycle with prefix " + "testCycleId" + " ....");
+
+        HttpResponse<String> response = this.createTest(frameworkType, run);
         JSONObject responseBody = this.validateResponse(response, "Import results");
         logResults(frameworkType, responseBody, hideDetails, logger);
         return response;
@@ -95,33 +84,29 @@ public class MLCloudClient {
         }
     }
 
-    private HttpResponse<String> createCycle(String cyclePrefix, Run run) {
+    private HttpResponse<String> createTest(String name, Run run) {
         String objective = "Created by automation run " + run.toString() ;
-        String cycleTitle = cyclePrefix + " - " + run.getTime().toString();
+        String cycleTitle = name + " - " + run.getTime().toString();
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("title",cycleTitle);
-        jsonObject.addProperty("objective", objective);
+        jsonObject.addProperty("name",cycleTitle);
+        jsonObject.addProperty("description", objective);
 
         return Unirest.post(getMLEndpoint(CREATE_CYCLE))
                 .header(CONTENT_TYPE_HEADER, APPLICATION_JSON_UNICODE)
-                .header("Authorization", getAuthKey("fakeApiKey"))
-                .routeParam("mlProjectId", this.projectId)
                 .body(jsonObject).asString();
     }
 
-    private HttpResponse<String> importResults(String testCycleId, String frameworkType,
+    private HttpResponse<String> importResults(String frameworkType,
                                                  boolean addCase, File f) {
         String uploadEndpoint = getMLEndpoint(IMPORT_RESULTS_FILE);
         return Unirest.post(uploadEndpoint)
-                .header("Authorization", getAuthKey("fakeApiKey"))
                 .queryString("type",frameworkType)
                 .routeParam("mlProjectId", this.projectId)
-                .routeParam("testCycleId", testCycleId)
                 .field("file", f).asString();
     }
 
     private static String getMLEndpoint(String url) {
-        return ML_TESTS_HOST + API_VERSION + url;
+        return ML_TESTS_HOST + url;
     }
 
     private static String getAuthKey(String apiKey) {

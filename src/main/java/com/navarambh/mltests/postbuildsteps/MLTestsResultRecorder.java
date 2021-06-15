@@ -5,6 +5,7 @@ import com.navarambh.mltests.model.MLFailure;
 import com.navarambh.mltests.model.MLTestCase;
 import com.navarambh.mltests.model.MLTestResult;
 import com.navarambh.mltests.utils.FileUtils;
+import com.navarambh.mltests.utils.MLCloudClient;
 import com.thoughtworks.xstream.XStream;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.*;
@@ -96,6 +97,14 @@ public class MLTestsResultRecorder extends Recorder implements SimpleBuildStep {
             MLTestResult result = (MLTestResult) xmlHudsonFile.read();
             taskListener.getLogger().println("name->>" + result.getName() + result.getTestcase().toString() +
                     " | " + result.getProperties().get(0).getProperty("java.class.version"));
+            try {
+                MLCloudClient aioClient = new MLCloudClient("fakeProjectID");
+                aioClient.importResults( this.frameworkType, this.hideDetails, run, taskListener.getLogger());
+            } catch (Exception e) {
+                e.printStackTrace();
+                taskListener.getLogger().println("Publishing results failed : " + e.getMessage());
+                this.setResultStatus(run, taskListener);
+            }
         }
 
         logStartEnd(false, taskListener);

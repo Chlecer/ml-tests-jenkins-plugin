@@ -4,6 +4,9 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.List;
 
@@ -19,6 +22,38 @@ public class MLTestCase implements Serializable {
     @XStreamAsAttribute
     @XStreamImplicit
     protected List<MLFailure> failure;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getClassname() {
+        return classname;
+    }
+
+    public void setClassname(String classname) {
+        this.classname = classname;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    public List<MLFailure> getFailure() {
+        return failure;
+    }
+
+    public void setFailure(List<MLFailure> failure) {
+        this.failure = failure;
+    }
 
     @Override
     public String toString() {

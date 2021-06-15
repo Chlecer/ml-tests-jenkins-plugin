@@ -3,8 +3,10 @@ package com.navarambh.mltests.model;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
+import java.io.Serializable;
+
 @XStreamAlias("failure")
-public class MLFailure {
+public class MLFailure implements Serializable {
 
     @XStreamAsAttribute
     protected String value;
