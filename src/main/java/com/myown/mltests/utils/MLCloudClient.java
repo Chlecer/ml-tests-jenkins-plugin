@@ -1,4 +1,4 @@
-package com.navarambh.mltests.utils;
+package com.myown.mltests.utils;
 
 import com.google.gson.JsonObject;
 import hudson.model.Run;
@@ -15,14 +15,15 @@ import java.util.Iterator;
 public class MLCloudClient {
     private static final String CONTENT_TYPE_HEADER = "Content-Type";
     private static final String APPLICATION_JSON_UNICODE = "application/json;charset=UTF-8";
-    private static final String ML_TESTS_HOST = "http://host.docker.internal:9090/";
     private static final String API_VERSION = "/api/v1";
     private static final String ML_SCHEME = "AioAuth";
     private static final String IMPORT_RESULTS_FILE = "/project/{mlProjectId}/testcycle/{testCycleId}/import/results";
     private static final String CREATE_CYCLE = "/tests";
+    private String mlServerAddress;
     private String projectId;
 
-    public MLCloudClient(String projectId) {
+    public MLCloudClient(String mlServerAddress, String projectId) {
+        this.mlServerAddress = mlServerAddress;
         this.projectId = projectId;
     }
 
@@ -105,8 +106,8 @@ public class MLCloudClient {
                 .field("file", f).asString();
     }
 
-    private static String getMLEndpoint(String url) {
-        return ML_TESTS_HOST + url;
+    private String getMLEndpoint(String url) {
+        return mlServerAddress + "/" + url;
     }
 
     private static String getAuthKey(String apiKey) {

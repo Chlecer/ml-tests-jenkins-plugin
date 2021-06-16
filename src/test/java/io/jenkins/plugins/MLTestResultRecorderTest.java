@@ -1,12 +1,13 @@
 package io.jenkins.plugins;
 
-import com.navarambh.mltests.model.MLFailure;
-import com.navarambh.mltests.model.MLTestCase;
-import com.navarambh.mltests.model.MLTestResult;
+import com.myown.mltests.model.MLFailure;
+import com.myown.mltests.model.MLTestCase;
+import com.myown.mltests.model.MLTestResult;
 import com.thoughtworks.xstream.XStream;
 import hudson.XmlFile;
 import hudson.util.HeapSpaceStringConverter;
 import hudson.util.XStream2;
+import org.junit.Assert;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,18 +22,15 @@ public class MLTestResultRecorderTest {
 
     @Test
     @DisplayName("Test first test")
-    void test() {
+    void test() throws URISyntaxException, IOException {
 
         XmlFile xmlHudsonFile = null;
-        try {
-            xmlHudsonFile = new XmlFile(XSTREAM, getDataFile("/test.xml"));
-            MLTestResult result = (MLTestResult) xmlHudsonFile.read();
-            System.out.println("name->>" + result.getName() + result.getTestcase().toString() +
-                    " | " + result.getProperties().get(0).getProperty("java.class.version"));
-        } catch (URISyntaxException | IOException e) {
-            e.printStackTrace();
-            System.out.println("deu coco");
-        }
+
+        xmlHudsonFile = new XmlFile(XSTREAM, getDataFile("/test.xml"));
+        MLTestResult result = (MLTestResult) xmlHudsonFile.read();
+        System.out.println("name->>" + result.getName() + result.getTestcase().toString() +
+                " | " + result.getProperties().get(0).getProperty("java.class.version"));
+        Assert.assertEquals("mluser", result.getName());
     }
 
     @Test

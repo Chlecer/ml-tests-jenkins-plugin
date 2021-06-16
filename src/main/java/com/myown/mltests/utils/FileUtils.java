@@ -1,8 +1,7 @@
-package com.navarambh.mltests.utils;
+package com.myown.mltests.utils;
 
 import java.io.File;
 import java.net.URISyntaxException;
-import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;

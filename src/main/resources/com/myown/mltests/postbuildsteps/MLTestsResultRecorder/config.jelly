@@ -12,6 +12,9 @@
         <f:entry title="Results file path" field="resultsFilePath">
             <f:textbox/>
         </f:entry>
+        <f:entry title="ML Server Address" field="mlServerAddress">
+            <f:textbox/>
+        </f:entry>
         <f:advanced>
             <f:entry title="Hide publish response details" field="hideDetails">
                 <f:checkbox field="hideDetails"/>

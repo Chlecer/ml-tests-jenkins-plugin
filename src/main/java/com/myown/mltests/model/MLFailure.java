@@ -1,4 +1,4 @@
-package com.navarambh.mltests.model;
+package com.myown.mltests.model;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;

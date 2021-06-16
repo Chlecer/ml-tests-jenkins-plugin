@@ -1,6 +1,7 @@
 package io.jenkins.plugins;
 
-import com.navarambh.mltests.utils.FileUtils;
+import com.myown.mltests.utils.FileUtils;
+import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -15,6 +16,6 @@ public class MLFileTest {
         Path resourceDirectory = Paths.get("src","test","resources");
         String testResourcesAbsolutePath = resourceDirectory.toFile().getAbsolutePath();
         Set<File> xmlFiles = new FileUtils().getXMLFiles(testResourcesAbsolutePath);
-        System.out.println(xmlFiles.size());
+        Assert.assertEquals(1, xmlFiles.size());
     }
 }

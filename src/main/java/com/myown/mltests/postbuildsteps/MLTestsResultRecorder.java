@@ -1,11 +1,11 @@
-package com.navarambh.mltests.postbuildsteps;
+package com.myown.mltests.postbuildsteps;
 
 import com.google.common.collect.ImmutableList;
-import com.navarambh.mltests.model.MLFailure;
-import com.navarambh.mltests.model.MLTestCase;
-import com.navarambh.mltests.model.MLTestResult;
-import com.navarambh.mltests.utils.FileUtils;
-import com.navarambh.mltests.utils.MLCloudClient;
+import com.myown.mltests.model.MLTestCase;
+import com.myown.mltests.utils.FileUtils;
+import com.myown.mltests.model.MLFailure;
+import com.myown.mltests.model.MLTestResult;
+import com.myown.mltests.utils.MLCloudClient;
 import com.thoughtworks.xstream.XStream;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.*;
@@ -16,7 +16,6 @@ import hudson.tasks.Publisher;
 import hudson.tasks.Recorder;
 import hudson.util.FormValidation;
 import hudson.util.HeapSpaceStringConverter;
-import hudson.util.Secret;
 import hudson.util.XStream2;
 import jenkins.model.Jenkins;
 import jenkins.tasks.SimpleBuildStep;
@@ -35,6 +34,7 @@ public class MLTestsResultRecorder extends Recorder implements SimpleBuildStep {
 
     private String frameworkType;
     private String resultsFilePath;
+    private String mlServerAddress;
     private Boolean failBuildOnFailure = false;
     private Boolean hideDetails = false;
     private Entry entry;
@@ -48,13 +48,17 @@ public class MLTestsResultRecorder extends Recorder implements SimpleBuildStep {
     }
 
     @DataBoundConstructor
-    public MLTestsResultRecorder(String frameworkType, String resultsFilePath) {
+    public MLTestsResultRecorder(String frameworkType, String resultsFilePath, String mlServerAddress) {
         this.frameworkType =frameworkType;
         this.resultsFilePath = resultsFilePath;
+        this.mlServerAddress = mlServerAddress;
     }
 
     public String getFrameworkType() { return frameworkType; }
     public String getResultsFilePath() { return resultsFilePath; }
+    public String getMlServerAddress() {
+        return mlServerAddress;
+    }
 
     public Boolean getFailBuildOnFailure() {
         return failBuildOnFailure;
@@ -96,9 +100,9 @@ public class MLTestsResultRecorder extends Recorder implements SimpleBuildStep {
             XmlFile xmlHudsonFile = new XmlFile(XSTREAM, xmlFile);
             MLTestResult result = (MLTestResult) xmlHudsonFile.read();
             taskListener.getLogger().println("name->>" + result.getName() + result.getTestcase().toString() +
-                    " | " + result.getProperties().get(0).getProperty("java.class.version"));
+                    " | " + result.getProperties().get(0).getProperty("java.class.version") + "| ML Server Address: " + mlServerAddress);
             try {
-                MLCloudClient aioClient = new MLCloudClient("fakeProjectID");
+                MLCloudClient aioClient = new MLCloudClient(mlServerAddress, "fakeProjectID");
                 aioClient.importResults( this.frameworkType, this.hideDetails, run, taskListener.getLogger());
             } catch (Exception e) {
                 e.printStackTrace();

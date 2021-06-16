@@ -1,4 +1,4 @@
-package com.navarambh.mltests.utils;
+package com.myown.mltests.utils;
 
 public class MLTestsAuthorizationException extends MLTestsException {
 
